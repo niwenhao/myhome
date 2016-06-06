@@ -147,6 +147,7 @@ colorscheme desert
 highlight LineNr ctermfg=darkyellow
 
 set et
+set mouse=a
 """"""""""""""""""""""""""""""
 
 
