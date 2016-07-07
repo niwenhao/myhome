@@ -2,3 +2,24 @@ export PATH=$HOME/.rbenv/bin:$PATH
 eval "$(rbenv init -)"
 
 export TERM=xterm-256color
+
+function java_proxyoption() {
+    local PROXY_ADDR=${http_proxy%/}
+    PROXY_ADDR=${PROXY_ADDR#*@}
+    local PROXY_PORT=${PROXY_ADDR#*:}
+    local PROXY_HOST=${PROXY_ADDR%:*}
+    local PROXY_AUTH=${http_proxy%@*}
+    PROXY_AUTH=${PROXY_AUTH##*/}
+    local PROXY_USER=${PROXY_AUTH%:*}
+    local PROXY_PWD=${PROXY_AUTH#*:}
+
+    local PROXY_OPTS="${PROXY_OPTS} -Dhttp.proxyHost=${PROXY_HOST}"
+    PROXY_OPTS="${PROXY_OPTS} -Dhttp.proxyPort=${PROXY_PORT}"
+
+    PROXY_OPTS="${PROXY_OPTS} -Dhttps.proxyHost=${PROXY_HOST}"
+    PROXY_OPTS="${PROXY_OPTS} -Dhttps.proxyPort=${PROXY_PORT}"
+
+    PROXY_OPTS="${PROXY_OPTS} -Dhttp.proxyUser=${PROXY_USER}"
+    PROXY_OPTS="${PROXY_OPTS} -Dhttp.proxyPassword=${PROXY_PWD}"
+    echo ${PROXY_OPTS}
+}
