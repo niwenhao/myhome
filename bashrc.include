@@ -23,3 +23,5 @@ function java_proxyoption() {
     PROXY_OPTS="${PROXY_OPTS} -Dhttp.proxyPassword=${PROXY_PWD}"
     echo ${PROXY_OPTS}
 }
+
+export JAVA_PROXY_OPTS=$(java_proxyoption)
