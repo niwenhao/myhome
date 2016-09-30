@@ -146,6 +146,9 @@ colorscheme desert
 " 行番号の色
 highlight LineNr ctermfg=darkyellow
 
+set acd
+set nowrap
+
 set et
 " set mouse=a
 """"""""""""""""""""""""""""""
