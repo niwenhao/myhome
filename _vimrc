@@ -28,6 +28,7 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'Shougo/unite.vim'
 Plugin 'Shougo/neomru.vim'
+Plugin 'rosenfeld/conque-term'
 
 
 " http://blog.remora.cx/2010/12/vim-ref-with-unite.html
@@ -150,7 +151,7 @@ set acd
 set nowrap
 
 set et
-" set mouse=a
+set mouse=a
 """"""""""""""""""""""""""""""
 
 
