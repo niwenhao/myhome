@@ -1,0 +1,24 @@
+mkdir CA
+cd CA 
+openssl genrsa -des3 -out rootCA.key 4096
+openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 3600 -out rootCA.crt
+################################################################################
+openssl genrsa -out gitlab.key 2048
+openssl req -new -key gitlab.key -out gitlab.csr
+openssl x509 -req -in gitlab.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out gitlab.crt -days 3600 -sha256
+################################################################################
+# ES256
+# Generate a private key
+openssl ecparam -out server-sig.key -name prime256v1 -genkey
+# Generate the public key
+openssl ec -in server-sig.key -pubout -out server-sig.pem
+# A gift, Generate the certify request.
+openssl req -new -key server-sig.key -sha256 -out server-sig.csr
+# A gift, Sign the certificate
+openssl x509 -req -in server-sig.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out server-sig.crt -days 3600 -sha256
+# A gift, Sign and verify some data.
+openssl dgst -sha256 -sign server-sig.key data-file > sign.sig
+# Take out the public key
+openssl x509 -in server-sig.crt -out pub.pem -pubkey
+# verify data
+openssl dgst -sha256 -verify pub.pem -signature sign.sig data-file
