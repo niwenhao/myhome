@@ -21,6 +21,12 @@ def prepare_env():
                        type=int,
                        help='TAT集計間隔',
                        required=True)
+    parser.add_argument('--dataptn', '-d',
+                        action="append"
+                        help="集計対象レコードキーワード")
+    parser.add_argument('--tatindex',
+                        type=int,
+                        help="tatデータ抽出項目番号(１ベース)")
 
 
     args = parser.parse_args()
@@ -36,9 +42,9 @@ def prepare_env():
         warmptn = None
 
     interval = datetime.timedelta(seconds=args.interval)
-    return (jnlfile, warmptn, interval)
+    return (jnlfile, warmptn, interval, args.dataptn, args.tatindex)
 
-(jnlfile, warmptn, interval) = prepare_env()
+(jnlfile, warmptn, interval, dataptns, tatindex) = prepare_env()
 
 start = None
 
@@ -52,10 +58,18 @@ for ln in jnlfile:
     if ln.find("GRPC_SERVER_REQ") != -1:
         continue
 
+    if dataptns and len(dataptns) > 0:
+        matched = False
+        for ptn in dataptns:
+            if ln.find(ptn) != -1:
+                matched = True
+        if not matched:
+            continue
+
     items = ln.split("\t")
     s = re.sub(r'\,.*$', "", items[0])
     ts = datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
-    tat = int(re.sub(r'\[msec\]$', "", items[11]))
+    tat = int(re.sub(r'\[msec\]$', "", items[tatindex-1]))
 
     if start == None:
         start = ts
