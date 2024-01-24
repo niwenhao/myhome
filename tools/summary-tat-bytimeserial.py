@@ -4,13 +4,6 @@ import re
 import io
 import datetime
 
-jnlfile: io.TextIOBase
-warmptn : re.Pattern
-interval = None
-start = None
-
-cnt = 0
-sum = 0
 
 def prepare_env():
     parser = argparse.ArgumentParser(description="アクセスジャーナルを解析して、開始時間から一定間隔でTATの平均をリストアップする。")
@@ -39,21 +32,29 @@ def prepare_env():
     
     if args.warmup:
         warmptn = re.compile(args.warmup)
+    else:
+        warmptn = None
 
     interval = datetime.timedelta(seconds=args.interval)
+    return (jnlfile, warmptn, interval)
 
+(jnlfile, warmptn, interval) = prepare_env()
 
-prepare_env()
+start = None
+
+cnt = 0
+sum = 0
 
 for ln in jnlfile:
-    if warmptn.search(ln):
+    if warmptn and warmptn.search(ln):
         continue
-    if ln.find("GRPC_SERVER_REQ") == -1:
+
+    if ln.find("GRPC_SERVER_REQ") != -1:
         continue
 
     items = ln.split("\t")
-    s = re.sub(r',.*$', "", items[0])
-    ts = datetime.datetime.strptime(s, "%Y/%m/%d %H:%M:%S")
+    s = re.sub(r'\,.*$', "", items[0])
+    ts = datetime.datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
     tat = int(re.sub(r'\[msec\]$', "", items[11]))
 
     if start == None:
@@ -64,9 +65,14 @@ for ln in jnlfile:
         sum += tat
     else:
         if start:
-            print(start.strftime("%F %T"), sum/cnt)
+            print(start.strftime("%Y-%m-%d %H:%M:%S"), cnt, sum/cnt)
         
-        while start + interval > ts:
+        f = False
+        while start + interval < ts:
             start += interval
+            if f:
+                print(start.strftime("%Y-%m-%d %H:%M:%S"))
+            else:
+                f = True
         cnt = 1
         sum = tat
