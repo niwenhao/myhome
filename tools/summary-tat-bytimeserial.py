@@ -22,11 +22,12 @@ def prepare_env():
                        help='TAT集計間隔',
                        required=True)
     parser.add_argument('--dataptn', '-d',
-                        action="append"
+                        action="append",
                         help="集計対象レコードキーワード")
     parser.add_argument('--tatindex',
                         type=int,
-                        help="tatデータ抽出項目番号(１ベース)")
+                        help="tatデータ抽出項目番号(１ベース)",
+                        required=True)
 
 
     args = parser.parse_args()
