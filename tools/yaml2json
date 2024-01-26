@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+
+import sys
+import yaml
+import json
+
+data = yaml.load(sys.stdin, Loader=yaml.CLoader)
+
+json.dump(data, sys.stdout, ensure_ascii=False)
