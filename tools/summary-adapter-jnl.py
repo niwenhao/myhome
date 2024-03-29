@@ -13,6 +13,8 @@
 
 import argparse
 import re
+import sys
+
 from collections import defaultdict
 
 def parse_args():
@@ -31,7 +33,8 @@ def process_line(line, patterns, summary):
                 summary[(timestamp[:16], status)][1] = min(summary[(timestamp[:16], status)][1], duration)
                 summary[(timestamp[:16], status)][2] = max(summary[(timestamp[:16], status)][2], duration)
                 summary[(timestamp[:16], status)][3] += duration
-    return timestamp[:16]
+                return timestamp[:16]
+    return None
 
 def print_summary(summary, key):
     count, min_duration, max_duration, total_duration = summary[key]
@@ -45,11 +48,12 @@ def main():
     with open(args.file, 'r') if args.file else sys.stdin as file:
         for line in file:
             current_timestamp = process_line(line, args.pattern, summary)
-            if last_timestamp and current_timestamp != last_timestamp:
-                for key in list(summary.keys()):
-                    if key[0] == last_timestamp:
-                        print_summary(summary, key)
-            last_timestamp = current_timestamp
+            if current_timestamp:
+                if last_timestamp and current_timestamp != last_timestamp:
+                    for key in list(summary.keys()):
+                        if key[0] == last_timestamp:
+                            print_summary(summary, key)
+                    last_timestamp = current_timestamp
     for key in list(summary.keys()):  # print remaining summaries
         print_summary(summary, key)
 
